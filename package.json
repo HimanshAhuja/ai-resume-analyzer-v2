@@ -1,0 +1,21 @@
+{
+  "name": "resume-analyzer",
+  "version": "1.0.0",
+  "description": "AI Resume Analyzer with Google Gemini",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.1.3"
+  },
+  "keywords": [
+    "resume",
+    "analyzer",
+    "ats",
+    "ai",
+    "gemini"
+  ],
+  "author": "",
+  "license": "MIT"
+}

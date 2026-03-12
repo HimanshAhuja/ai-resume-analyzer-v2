@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer - Smart ATS Score & Career Insights</title>
+    <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;600;700&family=General+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-overlay">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>AI Resume Analyzer</h1>
+            <p class="subtitle">Upload your resume and get instant ATS score with AI-powered improvement suggestions tailored to your field</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Upload Section -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">📄</span>
+                    Upload Resume
+                </h2>
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">⬆️</div>
+                    <p class="upload-text">Drag & drop your resume here or click to browse</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Supports PDF, DOC, DOCX (Max 5MB)</p>
+                    <input type="file" id="fileInput" accept=".pdf,.doc,.docx">
+                </div>
+                <div class="file-info" id="fileInfo">
+                    <p style="font-weight: 600;">✓ File uploaded successfully</p>
+                    <p id="fileName" style="color: var(--text-secondary); margin-top: 0.5rem;"></p>
+                </div>
+            </div>
+
+            <!-- Field Selection -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">🎯</span>
+                    Select Your Field
+                </h2>
+                <div class="field-grid">
+                    <div class="field-option" data-field="software">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💻</div>
+                        <div style="font-weight: 600;">Software Engineering</div>
+                    </div>
+                    <div class="field-option" data-field="data">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                        <div style="font-weight: 600;">Data Science</div>
+                    </div>
+                    <div class="field-option" data-field="design">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎨</div>
+                        <div style="font-weight: 600;">UI/UX Design</div>
+                    </div>
+                    <div class="field-option" data-field="marketing">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📱</div>
+                        <div style="font-weight: 600;">Digital Marketing</div>
+                    </div>
+                    <div class="field-option" data-field="finance">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
+                        <div style="font-weight: 600;">Finance</div>
+                    </div>
+                    <div class="field-option" data-field="hr">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
+                        <div style="font-weight: 600;">Human Resources</div>
+                    </div>
+                </div>
+                <button class="analyze-btn" id="analyzeBtn" disabled>
+                    Analyze Resume with AI
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2 class="card-title">
+                    <span class="icon">🎯</span>
+                    Analysis Results
+                </h2>
+                
+                <div class="score-display">
+                    <div class="score-circle">
+                        <svg width="200" height="200">
+                            <circle class="progress-ring" cx="100" cy="100" r="90" stroke="rgba(0, 229, 255, 0.1)" stroke-width="12" fill="none"/>
+                            <circle class="progress-ring progress-ring-circle" id="progressCircle" cx="100" cy="100" r="90" stroke="url(#gradient)" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="565.48" stroke-dashoffset="565.48"/>
+                            <defs>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color: var(--accent-primary)"/>
+                                    <stop offset="100%" style="stop-color: var(--accent-secondary)"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            <div class="score-number" id="scoreNumber">0</div>
+                            <div class="score-label">ATS Score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 1.5rem; margin-bottom: 1rem; font-family: 'Clash Display', sans-serif;">Key Improvements</h3>
+                <div class="improvements-list" id="improvementsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
