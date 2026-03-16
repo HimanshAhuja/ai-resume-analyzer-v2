@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const fieldNames = {
       'software': 'Software Engineering',
