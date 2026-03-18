@@ -62,34 +62,6 @@ function handleFile(file) {
     fileInfo.classList.add('active');
     checkAnalyzeEnabled();
 }
-```
-
----
-
-## **What This Does:**
-
-✅ **Creates a clickable link** from the uploaded file  
-✅ **Opens in new tab** when clicked (perfect for PDFs)  
-✅ **Downloads** if browser can't preview (for DOC files)  
-✅ **Visual indicator** with 📄 icon and "Click to view" text  
-✅ **Styled** with your accent color to show it's clickable
-
----
-
-## **How It Will Look:**
-
-Before:
-```
-✓ File uploaded successfully
-resume.pdf (245.67 KB)
-```
-
-After:
-```
-✓ File uploaded successfully
-📄 resume.pdf (245.67 KB) ← Click to view
-    ↑ This is now a clickable link!
-// Field Selection
 const fieldOptions = document.querySelectorAll('.field-option');
 fieldOptions.forEach(option => {
     option.addEventListener('click', () => {
