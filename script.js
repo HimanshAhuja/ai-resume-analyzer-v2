@@ -46,11 +46,49 @@ function handleFile(file) {
     }
 
     uploadedFile = file;
-    fileName.textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+    
+    // Create a clickable link for the file
+    const fileURL = URL.createObjectURL(file);
+    const fileSize = (file.size / 1024).toFixed(2);
+    
+    fileName.innerHTML = `
+        <a href="${fileURL}" target="_blank" style="color: var(--accent-primary); text-decoration: none; cursor: pointer;">
+            📄 ${file.name}
+        </a> 
+        <span style="color: var(--text-secondary); margin-left: 0.5rem;">(${fileSize} KB)</span>
+        <span style="color: var(--text-secondary); margin-left: 0.5rem; font-size: 0.85rem;">← Click to view</span>
+    `;
+    
     fileInfo.classList.add('active');
     checkAnalyzeEnabled();
 }
+```
 
+---
+
+## **What This Does:**
+
+✅ **Creates a clickable link** from the uploaded file  
+✅ **Opens in new tab** when clicked (perfect for PDFs)  
+✅ **Downloads** if browser can't preview (for DOC files)  
+✅ **Visual indicator** with 📄 icon and "Click to view" text  
+✅ **Styled** with your accent color to show it's clickable
+
+---
+
+## **How It Will Look:**
+
+Before:
+```
+✓ File uploaded successfully
+resume.pdf (245.67 KB)
+```
+
+After:
+```
+✓ File uploaded successfully
+📄 resume.pdf (245.67 KB) ← Click to view
+    ↑ This is now a clickable link!
 // Field Selection
 const fieldOptions = document.querySelectorAll('.field-option');
 fieldOptions.forEach(option => {
