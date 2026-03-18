@@ -1,5 +1,7 @@
+const pdf = require('pdf-parse');
+const mammoth = require('mammoth');
+
 module.exports = async (req, res) => {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -15,10 +17,10 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { field, resumeText } = req.body;
+    const { field, fileName, fileData, fileType } = req.body;
 
-    if (!field) {
-      return res.status(400).json({ error: 'Field is required' });
+    if (!field || !fileData) {
+      return res.status(400).json({ error: 'Field and file data required' });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -26,6 +28,26 @@ module.exports = async (req, res) => {
     if (!apiKey) {
       console.error('GEMINI_API_KEY not found');
       return res.status(500).json({ error: 'API key not configured' });
+    }
+
+    // Extract text from file
+    let resumeText = '';
+    try {
+      const buffer = Buffer.from(fileData, 'base64');
+      
+      if (fileType === 'application/pdf') {
+        const data = await pdf(buffer);
+        resumeText = data.text;
+      } else if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        const result = await mammoth.extractRawText({ buffer });
+        resumeText = result.value;
+      } else if (fileType === 'application/msword') {
+        // Basic DOC support (limited)
+        resumeText = buffer.toString('utf-8');
+      }
+    } catch (extractError) {
+      console.error('Text extraction error:', extractError);
+      resumeText = 'Unable to extract text from resume';
     }
 
     const fieldNames = {
@@ -39,29 +61,31 @@ module.exports = async (req, res) => {
 
     const fieldName = fieldNames[field] || field;
 
-    const prompt = `You are an expert ATS (Applicant Tracking System) analyzer. Analyze this resume for the ${fieldName} field.
+    const prompt = `You are an expert ATS (Applicant Tracking System) analyzer. Analyze this ACTUAL resume for the ${fieldName} field.
 
-Resume content: ${resumeText || 'Sample resume for ' + fieldName}
+RESUME CONTENT:
+${resumeText}
 
-Provide:
-1. An ATS score out of 100 (be realistic, typically 65-85 for most resumes)
+Based on the ACTUAL content above, provide:
+1. An ATS score out of 100 (be realistic and accurate based on the resume content)
 2. Exactly 5 specific, actionable improvements with priority levels (high/medium/low)
 
-Return ONLY valid JSON in this exact format (no markdown, no code blocks, no extra text):
+IMPORTANT: Analyze the ACTUAL resume content provided. If the resume doesn't match the ${fieldName} field at all, give a low score (20-40). If it's perfect for the field, give a high score (85-95).
+
+Return ONLY valid JSON in this exact format (no markdown, no code blocks):
 {
   "score": 75,
   "improvements": [
     {
-      "title": "improvement title here",
-      "description": "detailed explanation here",
+      "title": "specific improvement based on their resume",
+      "description": "detailed explanation referencing actual content from their resume",
       "priority": "high"
     }
   ]
 }
 
-Be specific, actionable, and tailored to ${fieldName}.`;
+Be specific and reference actual content from the resume.`;
 
-    // Call Gemini REST API directly
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
@@ -86,7 +110,6 @@ Be specific, actionable, and tailored to ${fieldName}.`;
     const data = await response.json();
     const text = data.candidates[0].content.parts[0].text;
 
-    // Parse JSON from response
     let analysis;
     try {
       const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -121,11 +144,11 @@ Be specific, actionable, and tailored to ${fieldName}.`;
 function generateFallbackImprovements(field) {
   const improvements = {
     'software': [
-      { title: 'Add Technical Keywords', description: 'Include specific programming languages, frameworks, and technologies relevant to job descriptions.', priority: 'high' },
-      { title: 'Quantify Achievements', description: 'Add metrics to your accomplishments to demonstrate measurable impact.', priority: 'high' },
-      { title: 'Include Certifications', description: 'Add technical certifications to stand out in automated screenings.', priority: 'medium' },
-      { title: 'Format Projects', description: 'Use clear project titles, tech stacks, and bullet points.', priority: 'medium' },
-      { title: 'Optimize Skills', description: 'Organize technical skills into categories for better ATS parsing.', priority: 'low' }
+      { title: 'Add Technical Keywords', description: 'Include specific programming languages, frameworks, and technologies.', priority: 'high' },
+      { title: 'Quantify Achievements', description: 'Add metrics to demonstrate measurable impact.', priority: 'high' },
+      { title: 'Include Certifications', description: 'Add technical certifications.', priority: 'medium' },
+      { title: 'Format Projects', description: 'Use clear project titles and tech stacks.', priority: 'medium' },
+      { title: 'Optimize Skills', description: 'Organize skills into categories.', priority: 'low' }
     ]
   };
   return improvements[field] || improvements['software'];
