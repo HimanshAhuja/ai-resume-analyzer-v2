@@ -56,7 +56,6 @@ function handleFile(file) {
             📄 ${file.name}
         </a> 
         <span style="color: var(--text-secondary); margin-left: 0.5rem;">(${fileSize} KB)</span>
-        <span style="color: var(--text-secondary); margin-left: 0.5rem; font-size: 0.85rem;">← Click to view</span>
     `;
     
     fileInfo.classList.add('active');
