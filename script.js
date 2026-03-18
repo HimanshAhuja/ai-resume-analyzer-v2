@@ -78,12 +78,16 @@ analyzeBtn.addEventListener('click', async () => {
 
 async function simulateAIAnalysis() {
     try {
-        // Get the API endpoint (works both locally and on Vercel)
+        // Read the actual file content
+        const fileContent = await uploadedFile.arrayBuffer();
+        const base64File = btoa(
+            new Uint8Array(fileContent).reduce((data, byte) => data + String.fromCharCode(byte), '')
+        );
+
         const apiUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000/api/analyze'
             : '/api/analyze';
 
-        // Call the actual AI API
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
@@ -91,7 +95,9 @@ async function simulateAIAnalysis() {
             },
             body: JSON.stringify({
                 field: selectedField,
-                resumeText: `Resume uploaded for ${selectedField} position` // In production, you'd extract actual text
+                fileName: uploadedFile.name,
+                fileData: base64File,
+                fileType: uploadedFile.type
             })
         });
 
@@ -100,20 +106,16 @@ async function simulateAIAnalysis() {
         }
 
         const data = await response.json();
-        
-        // Display the AI-generated results
         displayResults(data.score, data.improvements);
         
     } catch (error) {
         console.error('Error calling AI API:', error);
         
-        // Fallback to local analysis if API fails
         const score = generateSmartScore();
         const improvements = generateFallbackImprovements();
         displayResults(score, improvements);
     }
 }
-
 function generateSmartScore() {
     // Generate a realistic score between 65-85
     return Math.floor(Math.random() * 21) + 65;
